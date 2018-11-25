@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="Status of Bethesda Fallout 76 servers as reported by the Bethesda API.">
+    {{if .StatusOnline}}
+    <link rel="shortcut icon" href="static/icon/success/favicon.ico">
+    {{end}}
+    {{if .StatusOffline}}
+    <link rel="shortcut icon" href="static/icon/danger/favicon.ico">
+    {{end}}
+    {{if .StatusUnknown}}
+    <link rel="shortcut icon" href="static/icon/warning/favicon.ico">
+    {{end}}
+    <title>Fallout 76 - Server Status</title>
+    <!-- Bootstrap core CSS -->
+    <link href="static/css/bootstrap.min.css" rel="stylesheet">
+    <link href="static/css/custom.css" rel="stylesheet">
+    <!-- Google Analytics Code -->
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-129744331-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-129744331-1');
+    </script>
+</head>
+
+<body>
+
+<!-- Navigation -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+    <div class="container">
+        <a class="navbar-brand" href="#">Fallout 76 - Status</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="#status">Status</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#history">History</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#about">About</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+
+
+<main role="main" class="container" id="status">
+    <div class="jumbotron">
+        {{if .StatusOnline}}
+        <h1 id="status_text" class="text-success">ONLINE</h1>
+        {{end}}
+        {{if .StatusOffline}}
+        <h1 id="status_text" class="text-danger">OFFLINE</h1>
+        {{end}}
+        {{if .StatusUnknown}}
+        <h1 id="status_text" class="text-warning">UNKNOWN</h1>
+        {{end}}
+        <p id="status_ago" class="lead">Last Updated: {{.TimeAgoString}}</p>
+    </div>
+</main>
+
+
+
+<!-- Page Content -->
+<div class="container" id="history">
+    <div class="row">
+
+        <!-- header -->
+        <div class="col-lg-12">
+            <div class="pb-2 mt-4 mb-4 border-bottom">
+                <h1>Uptime History</h1>
+            </div>
+        </div>
+
+        <!-- month history -->
+        {{range .Months}}
+        <div class="col-lg-4 mb-4">
+            <div class="card mx-4">
+            <div class="card-body">
+                <h5 class="card-title">{{.Name}}</h5>
+                {{ range .DaysEmpty }}
+                    <i data-feather="circle" class="history_day text-secondary invisible"></i>
+                {{end}}
+                {{ range .Days }}
+                    {{if .StatusOnline}}
+                        <i data-feather="check-circle" class="history_day text-success" data-toggle="tooltip" data-placement="top" title="{{printf "%.f" .AmountMinuteDown}}m down"></i>
+                    {{end}}
+                    {{if .StatusOffline}}
+                        <i data-feather="x-circle" class="history_day text-danger" data-toggle="tooltip" data-placement="top" title="{{printf "%.f" .AmountMinuteDown}}m down"></i>
+                    {{end}}
+                    {{if .StatusUnknown}}
+                        <i data-feather="help-circle" class="history_day text-secondary"></i>
+                    {{end}}
+                {{end}}
+
+            </div>
+            </div>
+        </div>
+        {{end}}
+
+
+    </div>
+</div>
+
+
+<!-- Page Content -->
+<div class="container" id="about">
+    <div class="row">
+
+        <!-- header -->
+        <div class="col-lg-12">
+            <div class="pb-2 mt-4 mb-4 border-bottom">
+                <h1>About</h1>
+            </div>
+        </div>
+
+        <!-- content -->
+        <div class="col-lg-12">
+            <p>
+                This website was a small 2018 Thanksgiving side project created to try to track the uptime of the Fallout 76 servers.
+                We will see if the servers "Just Work" as claimed.
+                This site is powered by a <a href="https://golang.org/">Golang</a> webserver that queries the Bethesda API for server status and serves this as a website.
+                Note that the the above status is only recorded from the "Bethesda API", so this will only be of official downtimes (i.e. we are not actually checking the actual status of game servers here..).
+                An unknown status means that we where unable to get the status of the servers, or Bethesda themselves are reporting unknown status.
+                The online/offline status is updated every minute, and we report the uptime history for the past 6 months.
+                A day is considered to have "downtime" if there are more than 15 minutes of cumulative downtime, which we consider to be enough to disrupt a normal gaming session.
+                If you have any feedback/bugs or recommendations for the site please contact me at <a href = "mailto:support@fallout76status.com">support@fallout76status.com</a>.
+            </p>
+            <br/>
+            <p>
+                DISCLAIMER: This is by no means an official status page for Fallout 76 nor is this page endorsed by Bethesda.
+            </p>
+        </div>
+
+    </div>
+</div>
+
+
+<!-- Bootstrap core JavaScript -->
+<script src="static/js/jquery-3.3.1.min.js"></script>
+<script src="static/js/jquery.smooth-scroll.js"></script>
+<script src="static/js/jquery.fittext.js"></script>
+<script src="static/js/feather.min.js"></script>
+<script src="static/js/popper.min.js"></script>
+<script src="static/js/bootstrap.min.js"></script>
+
+<script>
+    $('.navbar a').smoothScroll({offset:-70});
+    feather.replace()
+    $(function () {
+        $('[data-toggle="tooltip"]').tooltip()
+        jQuery("#status_text").fitText(0.4);
+    })
+</script>
+
+
+</body>
+
+</html>

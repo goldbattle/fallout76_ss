@@ -1,0 +1,37 @@
+
+
+
+/* Add padding since we have a fixed navbar */
+body {
+    padding-top: 70px;
+    margin-bottom: 6em;
+}
+
+
+
+/* Our main status text, nice and large */
+#status_text  {
+    /*font-size: 12rem;*/
+    font-size: 260px;
+    text-align: center;
+    width: 100%;
+    display: block;
+}
+
+/* Status sub-text for how long ago this was updated */
+#status_ago {
+    text-align: center;
+}
+
+/* for our calender, we have 7 columns for each (so 100/7% ) */
+.history_day {
+    width: 12.91%;
+    margin-bottom: 0.5em;
+    height: 120%;
+}
+
+
+
+
+
+
