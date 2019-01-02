@@ -24,6 +24,14 @@ var (
 	listenAddr string
 )
 
+
+// Result of our database return for the homepage
+// Note: we do this since querying the database has become slow and I am too lazy to optimize it
+// Note: thus we just refresh the data every few minutes
+var homeData api_db.HomepageData
+var homeTicker time.Ticker
+
+
 // Main function
 // This will start the server and also start the ticker
 // This ticker will poll the API, while the webserver will serve traffic
@@ -44,6 +52,18 @@ func main() {
 		return fmt.Sprintf("%d", time.Now().UnixNano())
 	}
 
+	// Make our homepage data poller (updates every two minute)
+	homeTicker := time.NewTicker(120*time.Second)
+	go func() {
+		for ; true; <-homeTicker.C {
+			// Open our database connection
+			db := api_db.OpenDatabase()
+			defer db.Close()
+			// Get the data from our database object
+			homeData = api_db.GetHomepageData(db)
+		}
+	}()
+
 	// Now create the server
 	server := &http.Server{
 		Addr:         listenAddr,
@@ -60,6 +80,7 @@ func main() {
 	}
 
 	// end of program stop ticker
+	homeTicker.Stop()
 	api_calls.StopAPITicker()
 	logger.Println("Server and Ticker stopped")
 
@@ -84,10 +105,14 @@ func routes() *http.ServeMux {
 		// Open our database connection
 		db := api_db.OpenDatabase()
 		defer db.Close()
-		// Get the data from our database object
-		data := api_db.GetHomepageData(db)
+		// Get the data from our database object (just update the current status)
+		status, strtime := api_db.GetCurrentStatus(db)
+		homeData.StatusOnline = (status == 1)
+		homeData.StatusOffline = (status == 2)
+		homeData.StatusUnknown = (status != 1 && status != 2)
+		homeData.TimeAgoString = strtime
 		// Render the template
-		tmpl.Execute(w, data)
+		tmpl.Execute(w, homeData)
 	})
 
 	// Here we convert all the "static" paths to where our static js/css files are stored

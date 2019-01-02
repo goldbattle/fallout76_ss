@@ -29,11 +29,11 @@ func SetPollingFrequency(secs int) {
 func StartAPITicker() {
 
 	// Make the ticker
-	ticker := time.NewTicker(time.Second * freq).C
+	ticker := time.NewTicker(time.Second * freq)
 	go func() {
 		for {
 			select {
-			case <-ticker:
+			case <-ticker.C:
 
 				// Open the database
 				db := api_db.OpenDatabase()
